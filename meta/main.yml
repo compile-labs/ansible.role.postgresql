@@ -1,0 +1,32 @@
+---
+  galaxy_info:
+    author: Muhamamd Taqi Hassan
+    description: A role to install and manage PostgreSQL on RHEL and CentOS
+    company: Compile Labs
+    license: MIT
+    min_ansible_version: 2.0
+
+    platforms:
+    - name: Ubuntu
+      versions:
+      - trusty
+      - xenial
+    - name: Fedora
+      versions:
+      - 25
+      - 26
+    - name: CentOS
+      versions:
+      - trusty
+      - xenial
+    - name: EL
+      versions:
+      - 7
+    categories:
+    - database
+    - database:sql
+    - postgresql
+    - postgresql:postgis
+    - pgAdmin3
+
+  dependencies: []

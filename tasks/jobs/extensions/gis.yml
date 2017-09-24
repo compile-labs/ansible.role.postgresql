@@ -1,0 +1,25 @@
+---
+  - name: add ubuntu-gis ppa
+    apt_repository: >
+      repo="{{ postgresql_postgis_repository }}"
+      state=present
+    when: postgresql_postgis_enabled
+
+#- name: create postgis extension in db
+#  command: psql -c "CREATE EXTENSION postgis; CREATE EXTENSION postgis_topology; CREATE EXTENSION fuzzystrmatch;  CREATE EXTENSION postgis_tiger_geocoder;" --dbname={{dbname}}
+#  sudo_user: postgres
+#  when: db_created.changed
+
+#- name: Enable postgres unaccent extension
+#  shell: psql -v ON_ERROR_STOP=1 --dbname={{dbname}} -c "CREATE EXTENSION IF NOT EXISTS unaccent;"
+#  become: true
+#  become_user: postgres
+#  vars:
+#    ansible_ssh_pipelining: true
+#
+#- name: Enable postgres pg_trgm extension
+#  shell: psql -v ON_ERROR_STOP=1 --dbname={{dbname}} -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+#  become: true
+#  become_user: postgres
+#  vars:
+#    ansible_ssh_pipelining: true

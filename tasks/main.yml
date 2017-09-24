@@ -1,0 +1,47 @@
+---
+# tasks file for postgresql
+
+  - name: Summary
+    debug: "msg='Start installing PGSQL on {{ansible_distribution}} Server!'"
+
+  - name: Include OS-distribution specific variables
+    include_vars: "{{ansible_os_family}}.yml"
+
+  - include: jobs/postgresql/install.yml
+    tags: postgresql.install
+
+  - include: jobs/postgresql/configure.yml
+    tags: postgresql.configure
+
+  - include: jobs/postgresql/databases.yml
+    tags: postgresql.databases
+
+  - include: jobs/postgresql/users.yml
+    tags: postgresql.users
+
+#  - include: jobs/postgresql/backup.yml
+#    tags: postgresql.backup
+#
+#  - include: jobs/postgresql/restore.yml
+#    tags: postgresql.restore
+#
+#  - include: jobs/postgresql/extensions.yml
+#    tags: postgresql.extensions
+
+#- name: Postgresql | Give vagrant access to the database instance
+#  lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+#                 regexp='host\s+all\s+all\s+127.0.0.1/32\s+md5'
+#                 line='host all all 0.0.0.0/0 md5'
+#                 insertbefore=BOF
+#  become: yes
+
+  - name: Install PgAdmin
+    become: yes
+    apt: name={{ item }} update_cache=yes state=installed
+    with_items:
+      - pgadmin3
+    tags: pgadmin3
+    when: is_localhost == true
+
+  - name: Summary
+    debug: "msg='Success! Setting UP PostgreSQL on {{ansible_distribution}} Server!'"

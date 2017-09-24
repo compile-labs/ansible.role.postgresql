@@ -1,0 +1,70 @@
+---
+  - name: Postgresql | Ensure postgres will listen on all interfaces
+    lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+      regexp='^#?listen_addresses\s*='
+      line="listen_addresses = '0.0.0.0'"
+      state=present
+    notify: restart postgresql
+    become: yes
+
+  - name: Postgresql | Ensure postgres will trust local unix connections
+    lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+      regexp='local\s+all\s+all'
+      line='local all all trust'
+      insertafter=EOF
+      backrefs=yes
+    notify: restart postgresql
+    become: yes
+
+  - name: Postgresql | Ensure postgres will trust local TCP/IP connections
+    lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+      regexp='host\s+all\s+all\s+127.0.0.1/32'
+      line='host all all 127.0.0.1/32 trust'
+      insertafter=EOF
+      backrefs=yes
+    notify: restart postgresql
+    become: yes
+
+  - name: Postgresql | Ensure postgres allows all connections (DEV hosts)
+    lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+      regexp='host\s+all\s+all\s+0.0.0.0/0\s+md5'
+      line='host all all 0.0.0.0/0 md5'
+      insertafter=EOF
+    notify: restart postgresql
+    become: yes
+
+#- name: Initialize PostgreSQL server
+#  become: yes
+#  command: "{{ pgsql_initdb_path }} initdb creates={{ pgsql_data_directory }}/postgresql.conf"
+#  environment:
+#    PGSETUP_INITDB_OPTIONS: "--pgdata={{ pgsql_data_directory }}"
+#  notify:
+#    - Restart PostgreSQL
+#
+#- name: Write PostgreSQL client authentication file (pg_hba.conf)
+#  template:
+#    src: pg_hba.conf.j2
+#    dest: "{{ pgsql_data_directory }}/pg_hba.conf"
+#    owner: "{{ pgsql_service_user }}"
+#    group: "{{ pgsql_service_group }}"
+#    mode: 0640
+#  notify:
+#    - Restart PostgreSQL
+#
+#- name: Write PostgreSQL configuration file (postgresql.conf)
+#  template:
+#    src: postgresql.conf.j2
+#    dest: "{{ pgsql_data_directory }}/postgresql.conf"
+#    owner: "{{ pgsql_service_user }}"
+#    group: "{{ pgsql_service_group }}"
+#    mode: 0640
+#  notify:
+#    - Restart PostgreSQL
+#
+#- name: Create directory for additional configuration files
+#  file:
+#    name: "{{pgsql_data_directory}}/conf.d"
+#    state: directory
+#    owner: "{{ pgsql_service_user }}"
+#    group: "{{ pgsql_service_group }}"
+#    mode: 0755

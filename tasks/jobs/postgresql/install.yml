@@ -1,0 +1,68 @@
+---
+  # For Debian Ubuntu
+
+  - name: Add the PostgreSQL repository key to the apt trusted keys
+    become: yes
+    apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc
+             state=present
+
+  - name: Add the PostgreSQL repository to the apt sources list
+    become: yes
+    apt_repository: repo='deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main'
+                    update_cache=yes
+                    state=present
+
+  - name: Ensure locale is available
+    locale_gen: name=en_US.UTF-8
+
+  - name: Install PostgreSQL
+    become: yes
+    apt: name={{ item }} update_cache=yes state=installed
+    with_items:
+      - postgresql-{{ pgsql_version }}              # core database server
+#      - postgresql-client-{{ pgsql_version }}       # client libraries and client binaries
+      - postgresql-contrib-{{ pgsql_version }}      # additional supplied modules
+#      - postgresql-server-dev-{{ pgsql_version }}   # libraries and headers for C language backend development
+      - python-psycopg2
+      - python3-psycopg2
+    tags: packages
+    notify: restart postgresql
+    when: ansible_os_family == "Debian" and ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
+
+#  - name: Ensure PostgreSQL repository is installed
+#    yum: name={{ item }}
+#    with_items:
+#    - epel-release
+#    - http://yum.postgresql.org/9.4/redhat/rhel-{{ el_version }}-x86_64/pgdg-centos94-{{ pgsql_version }}-3.noarch.rpm
+#
+#  - name: Ensure PostgreSQL server packages are installed
+#    yum:
+#      state: latest
+#      pkg: "{{ item }}"
+#    with_items:
+#      - postgresql{{ pgsql_version|replace('.', '') }}-server
+#      - postgresql{{ pgsql_version|replace('.', '') }}-contrib
+#      - python-psycopg2
+#      - pv
+#
+#  - name: Ensure PostgreSQL log directory is present
+#    file:
+#      mode: 0755
+#      owner: "{{ pgsql_service_user }}"
+#      group: "{{ pgsql_service_group }}"
+#      path: "{{ pgsql_log_directory }}"
+#      state: directory
+#
+#  - name: Ensure PostgreSQL data directory is present
+#    file:
+#      mode: 0700
+#      owner: "{{ pgsql_service_user }}"
+#      group: "{{ pgsql_service_group }}"
+#      path: "{{ pgsql_data_directory }}"
+#      state: directory
+#
+#  - name: Ensure PostgreSQL contrib package is installed
+#    yum:
+#      state: latest
+#      pkg: postgresql{{ pgsql_version|replace('.', '') }}-contrib
+#    when: pgsql_install_contrib

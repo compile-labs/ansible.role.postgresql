@@ -1,0 +1,29 @@
+---
+  - name: Postgresql | Ensure user has access to the database
+    become: yes
+    become_user: postgres
+    no_log: True
+    postgresql_user: db={{ db_name }}
+                     name={{ db_user }}
+                     password={{ db_password }}
+                     priv=ALL
+                     state=present
+    vars:
+      ansible_ssh_pipelining: true
+
+  - name: Postgresql | Ensure user does not have unnecessary privileges
+    become: yes
+    become_user: postgres
+    postgresql_user: name={{ db_user }}
+                     role_attr_flags=NOSUPERUSER,NOCREATEDB
+                     state=present
+    vars:
+      ansible_ssh_pipelining: true
+
+#- name: Ensure database users are created
+#  postgresql_user:
+#    encrypted: no
+#    name: "{{ pgsql__user }}"
+#    password: "{{ pgsql__user_pass }}"
+#    state: present
+#    role_attr_flags: "LOGIN,SUPERUSER"

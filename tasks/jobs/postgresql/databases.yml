@@ -1,0 +1,60 @@
+---
+  - name: Postgresql | Ensure database is created
+    become: yes
+    become_user: postgres
+    postgresql_db: name={{ db_name }}
+                   encoding='UTF-8'
+                   lc_collate='en_US.UTF-8'
+                   lc_ctype='en_US.UTF-8'
+                   template='template0'
+                   state=present
+    vars:
+      ansible_ssh_pipelining: true
+
+#  - name: create a database called module_test
+#    postgresql_db:
+#      name: module_test2
+#      owner: postgres
+#      state: present
+#      template: template0
+#      encoding: UTF-8
+#      lc_collate: en_US.UTF-8
+#      lc_ctype: en_US.UTF-8
+#      #login_host: 127.0.0.1
+#      #port: 5432
+#      #login_user: postgres
+#    become: yes
+#    become_user: postgres
+#    when: ansible_os_family == "Debian" and ansible_distribution == "Ubuntu"  and ansible_architecture == "x86_64" and ansible_pkg_mgr == "apt"
+#
+#  - name: remove database called module_test
+#    postgresql_db:
+#      name: module_test2
+#      owner: postgres
+#      state: absent
+#    become: yes
+#    become_user: postgres
+#    when: ansible_os_family == "Debian" and ansible_distribution == "Ubuntu"  and ansible_architecture == "x86_64" and ansible_pkg_mgr == "apt"
+#
+#
+#
+#  - name: Ensure databases are created
+#    postgresql_db:
+#      encoding: UTF-8
+#      lc_collate: en_US.UTF-8
+#      lc_ctype: en_US.UTF-8
+#      name: "{{ pgsql__db__name }}"
+#      owner: "{{ pgsql__user }}"
+#      state: present
+#      template: template0
+#    become: yes
+#    become_user: postgres
+#
+#  - name: Ensure database extensions are enabled
+#    become: yes
+#    become_user: "{{ pgsql_admin_user }}"
+#    command: "psql {{ item[0].name }} -c 'CREATE EXTENSION IF NOT EXISTS {{ item[1] }}'"
+#    with_nested:
+#      - pgsql_databases
+#      - pgsql_extensions
+#    when: pgsql_install_contrib and pgsql_extensions|length > 0
