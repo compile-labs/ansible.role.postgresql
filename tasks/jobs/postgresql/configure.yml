@@ -1,9 +1,11 @@
 ---
-  - name: Postgresql | Ensure postgres will listen on all interfaces
-    lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
-      regexp='^#?listen_addresses\s*='
-      line="listen_addresses = '0.0.0.0'"
-      state=present
+  - name: Configure PostgreSQL host-based authentication
+    template: src=pg_hba.conf.j2 dest=/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+    notify: restart postgresql
+    become: yes
+
+  - name: Configure PostgreSQL
+    template: src=postgresql.conf.j2 dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
     notify: restart postgresql
     become: yes
 
@@ -32,39 +34,3 @@
       insertafter=EOF
     notify: restart postgresql
     become: yes
-
-#- name: Initialize PostgreSQL server
-#  become: yes
-#  command: "{{ pgsql_initdb_path }} initdb creates={{ pgsql_data_directory }}/postgresql.conf"
-#  environment:
-#    PGSETUP_INITDB_OPTIONS: "--pgdata={{ pgsql_data_directory }}"
-#  notify:
-#    - Restart PostgreSQL
-#
-#- name: Write PostgreSQL client authentication file (pg_hba.conf)
-#  template:
-#    src: pg_hba.conf.j2
-#    dest: "{{ pgsql_data_directory }}/pg_hba.conf"
-#    owner: "{{ pgsql_service_user }}"
-#    group: "{{ pgsql_service_group }}"
-#    mode: 0640
-#  notify:
-#    - Restart PostgreSQL
-#
-#- name: Write PostgreSQL configuration file (postgresql.conf)
-#  template:
-#    src: postgresql.conf.j2
-#    dest: "{{ pgsql_data_directory }}/postgresql.conf"
-#    owner: "{{ pgsql_service_user }}"
-#    group: "{{ pgsql_service_group }}"
-#    mode: 0640
-#  notify:
-#    - Restart PostgreSQL
-#
-#- name: Create directory for additional configuration files
-#  file:
-#    name: "{{pgsql_data_directory}}/conf.d"
-#    state: directory
-#    owner: "{{ pgsql_service_user }}"
-#    group: "{{ pgsql_service_group }}"
-#    mode: 0755

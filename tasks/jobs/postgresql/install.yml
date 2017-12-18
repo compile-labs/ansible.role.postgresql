@@ -1,27 +1,27 @@
 ---
   # For Debian Ubuntu
 
-  - name: Add the PostgreSQL repository key to the apt trusted keys
+  - name: Add the PostgreSQL repository APT key to the apt trusted keys
     become: yes
-    apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc
-             state=present
+    apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
 
-  - name: Add the PostgreSQL repository to the apt sources list
+  - name: Configure the PostgreSQL APT repositories to the apt sources list
     become: yes
-    apt_repository: repo='deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main'
-                    update_cache=yes
-                    state=present
+    apt_repository: repo="deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release}}-pgdg main" state=present
+
+  - include: jobs/update.apt.yml
 
   - name: Ensure locale is available
     locale_gen: name=en_US.UTF-8
 
   - name: Install PostgreSQL
     become: yes
-    apt: name={{ item }} update_cache=yes state=installed
+    apt: pkg={{ item }} state=present
     with_items:
       - postgresql-{{ pgsql_version }}              # core database server
 #      - postgresql-client-{{ pgsql_version }}       # client libraries and client binaries
       - postgresql-contrib-{{ pgsql_version }}      # additional supplied modules
+      - postgresql-server-dev-{{ postgresql_version }}
 #      - postgresql-server-dev-{{ pgsql_version }}   # libraries and headers for C language backend development
       - python-psycopg2
       - python3-psycopg2

@@ -37,11 +37,13 @@
 
   - name: Install PgAdmin
     become: yes
-    apt: name={{ item }} update_cache=yes state=installed
+    apt: name={{ item }} state=installed
     with_items:
       - pgadmin3
     tags: pgadmin3
     when: is_localhost == true
+
+  - include: jobs/update.apt.yml
 
   - name: Summary
     debug: "msg='Success! Setting UP PostgreSQL on {{ansible_distribution}} Server!'"
